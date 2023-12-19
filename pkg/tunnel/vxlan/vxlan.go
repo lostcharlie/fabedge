@@ -23,6 +23,7 @@ import (
 	"net"
 	"os/exec"
 	"strconv"
+	"strings"
 )
 
 var _ tunnel.Manager = &VxlanManager{}
@@ -56,6 +57,16 @@ func CreateVxlanManager(mtu, vni, port int, vtepDevName string) VxlanManager {
 		VtepDevName: vtepDevName,
 		Connections: make(map[string]VxlanUnicastConfig),
 	}
+}
+
+func GetFirstInterface() string {
+	list, _ := netlink.LinkList()
+	for _, val := range list {
+		if val.Type() == "device" && !(strings.HasPrefix(val.Attrs().Name, "lo")) {
+			return val.Attrs().Name
+		}
+	}
+	return ""
 }
 
 func (m VxlanManager) IsRunning() bool {

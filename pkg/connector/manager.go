@@ -17,6 +17,7 @@ package connector
 import (
 	"context"
 	"encoding/json"
+	"github.com/fabedge/fabedge/pkg/tunnel/vxlan"
 	"net/http"
 	"os"
 	"os/signal"
@@ -40,7 +41,6 @@ import (
 	"github.com/fabedge/fabedge/pkg/common/about"
 	"github.com/fabedge/fabedge/pkg/connector/routing"
 	"github.com/fabedge/fabedge/pkg/tunnel"
-	"github.com/fabedge/fabedge/pkg/tunnel/strongswan"
 	"github.com/fabedge/fabedge/pkg/util/memberlist"
 )
 
@@ -100,14 +100,15 @@ func (c *Config) AddFlags(fs *pflag.FlagSet) {
 }
 
 func (c Config) Manager() (*Manager, error) {
-	tm, err := strongswan.New(
-		strongswan.SocketFile(c.ViciSocket),
-		strongswan.StartAction("none"),
-		strongswan.InitTimeout(10),
-	)
-	if err != nil {
-		return nil, err
-	}
+	//tm, err := strongswan.New(
+	//	strongswan.SocketFile(c.ViciSocket),
+	//	strongswan.StartAction("none"),
+	//	strongswan.InitTimeout(10),
+	//)
+	//if err != nil {
+	//	return nil, err
+	//}
+	tm := vxlan.CreateVxlanManager(1450, 10, 4789, vxlan.GetFirstInterface())
 
 	router, err := routing.GetRouter(c.CNIType)
 	if err != nil {

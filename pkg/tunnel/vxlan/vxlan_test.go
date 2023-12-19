@@ -18,19 +18,8 @@ import (
 	"github.com/fabedge/fabedge/pkg/tunnel"
 	"github.com/vishvananda/netlink"
 	"net"
-	"strings"
 	"testing"
 )
-
-func getFirstInterface() string {
-	list, _ := netlink.LinkList()
-	for _, val := range list {
-		if val.Type() == "device" && !(strings.HasPrefix(val.Attrs().Name, "lo")) {
-			return val.Attrs().Name
-		}
-	}
-	return ""
-}
 
 func TestCreateMulticastVxlan(t *testing.T) {
 	config := VxlanMulticastConfig{
@@ -42,7 +31,7 @@ func TestCreateMulticastVxlan(t *testing.T) {
 		MTU:         1450,
 		VNI:         10,
 		Port:        4789,
-		VtepDevName: getFirstInterface(),
+		VtepDevName: GetFirstInterface(),
 	}
 	err := m.createMulticastVxlan(config)
 	if err != nil {
@@ -76,7 +65,7 @@ func TestCreateUnicastVxlan(t *testing.T) {
 		MTU:         1450,
 		VNI:         10,
 		Port:        4789,
-		VtepDevName: getFirstInterface(),
+		VtepDevName: GetFirstInterface(),
 	}
 	err := m.createUnicastVxlan(config)
 	if err != nil {
@@ -100,7 +89,7 @@ func TestCreateUnicastVxlan(t *testing.T) {
 }
 
 func TestVxlanManager(t *testing.T) {
-	m := CreateVxlanManager(1450, 10, 4789, getFirstInterface())
+	m := CreateVxlanManager(1450, 10, 4789, GetFirstInterface())
 	conn := tunnel.ConnConfig{
 		Name:            "vxlantest0",
 		LocalAddress:    []string{"192.168.2.61"},

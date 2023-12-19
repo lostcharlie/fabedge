@@ -16,6 +16,7 @@ package agent
 
 import (
 	"fmt"
+	"github.com/fabedge/fabedge/pkg/tunnel/vxlan"
 	"net"
 	"strings"
 	"time"
@@ -25,7 +26,6 @@ import (
 	"k8s.io/klog/v2/klogr"
 	"k8s.io/utils/exec"
 
-	"github.com/fabedge/fabedge/pkg/tunnel/strongswan"
 	"github.com/fabedge/fabedge/pkg/util/ipset"
 	"github.com/fabedge/fabedge/third_party/ipvs"
 )
@@ -163,15 +163,16 @@ func (cfg *Config) Validate() error {
 }
 
 func (cfg Config) Manager() (*Manager, error) {
-	tm, err := strongswan.New(
-		strongswan.StartAction("clear"),
-		strongswan.DpdDelay("10s"),
-		strongswan.DpdAction("trap"),
-		strongswan.InitTimeout(cfg.TunnelInitTimeout),
-	)
-	if err != nil {
-		return nil, err
-	}
+	//tm, err := strongswan.New(
+	//	strongswan.StartAction("clear"),
+	//	strongswan.DpdDelay("10s"),
+	//	strongswan.DpdAction("trap"),
+	//	strongswan.InitTimeout(cfg.TunnelInitTimeout),
+	//)
+	//if err != nil {
+	//	return nil, err
+	//}
+	tm := vxlan.CreateVxlanManager(1450, 10, 4789, vxlan.GetFirstInterface())
 
 	m := &Manager{
 		Config: cfg,
