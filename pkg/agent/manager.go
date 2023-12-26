@@ -163,6 +163,7 @@ func (m *Manager) maintainNetwork() error {
 	return m.ensureIPTablesRules()
 }
 
+// TODO: Check this
 func (m *Manager) ensureConnections() error {
 	current, peers := m.getCurrentEndpoint(), m.getPeerEndpoints()
 
@@ -220,6 +221,7 @@ func (m *Manager) ensureConnections() error {
 	return delStaleRoutes(peers)
 }
 
+// TODO: Check this
 func (m *Manager) ensureMediatorConnection(current, peer Endpoint) {
 	conn := tunnel.ConnConfig{
 		Name: peer.Name,
@@ -254,6 +256,7 @@ func (m *Manager) ensureMediatorConnection(current, peer Endpoint) {
 	}
 }
 
+// TODO: Check this
 func (m *Manager) ensureConnection(current, peer Endpoint, mediator *Endpoint, gw, gw6 net.IP) {
 	conn := tunnel.ConnConfig{
 		Name: peer.Name,

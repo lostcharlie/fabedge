@@ -85,9 +85,21 @@ func (m VxlanManager) LoadConn(conn tunnel.ConnConfig) error {
 	connection := VxlanUnicastConfig{
 		Name:          conn.Name,
 		VtepAddress:   conn.EndpointAddress,
-		LocalAddress:  conn.LocalAddress[0],
-		RemoteAddress: conn.RemoteAddress[0],
+		LocalAddress:  "",
+		RemoteAddress: "",
 	}
+
+	// Edge Node
+	if conn.LocalAddress != nil && conn.RemoteAddress != nil {
+		connection.LocalAddress = conn.LocalAddress[0]
+		connection.RemoteAddress = conn.RemoteAddress[0]
+	}
+	if conn.LocalAddress == nil {
+		connection.LocalAddress = GetFirstInterface()
+	}
+	fmt.Printf("[VxlanManager] LoadConn, Name: %s, LocalAddress: %s, RemoteAddress: %s, VtepAddress: %s",
+		connection.Name, connection.LocalAddress, connection.RemoteAddress, connection.VtepAddress)
+
 	m.Connections[connection.Name] = connection
 	return nil
 }
@@ -96,6 +108,10 @@ func (m VxlanManager) InitiateConn(name string) error {
 	if connection, exist := m.Connections[name]; !exist {
 		return fmt.Errorf("cannot find connection %s", name)
 	} else {
+		if m.Connections[name].LocalAddress == "" || m.Connections[name].RemoteAddress == "" {
+			// Ignore Edge node
+			return nil
+		}
 		err := m.deleteVxlan(name)
 		if err != nil {
 			return err

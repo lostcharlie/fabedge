@@ -132,6 +132,7 @@ func (m *Manager) classifyConnectionSubnets() {
 	m.ipt6Handler.setIPSetEntrySet(edgePodCIDRs6, edgeNodeCIDRs6, cloudPodCIDRs6, cloudNodeCIDRs6)
 }
 
+// TODO: Check this
 func (m *Manager) syncConnections() error {
 	err := m.readCfgFromFile()
 	if err != nil {
@@ -193,6 +194,7 @@ func (m *Manager) syncConnections() error {
 	return nil
 }
 
+// TODO: Check this
 func (m *Manager) clearConnections() {
 	oldNames, err := m.tm.ListConnNames()
 	if err != nil {
