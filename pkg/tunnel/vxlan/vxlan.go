@@ -50,6 +50,8 @@ type VxlanUnicastConfig struct {
 }
 
 func CreateVxlanManager(mtu, vni, port int, vtepDevName string) VxlanManager {
+	fmt.Printf("[VxlanManager] Create vxlan manager, mtu = %d, vni = %d, port = %d, vtepDevName = %s.",
+		mtu, vni, port, vtepDevName)
 	return VxlanManager{
 		MTU:         mtu,
 		VNI:         vni,
@@ -64,6 +66,17 @@ func GetFirstInterface() string {
 	for _, val := range list {
 		if val.Type() == "device" && !(strings.HasPrefix(val.Attrs().Name, "lo")) {
 			return val.Attrs().Name
+		}
+	}
+	return ""
+}
+
+func GetAddressOfFirstInterface() string {
+	list, _ := netlink.LinkList()
+	for _, val := range list {
+		if val.Type() == "device" && !(strings.HasPrefix(val.Attrs().Name, "lo")) {
+			ret, _ := netlink.AddrList(val, netlink.FAMILY_V4)
+			return ret[0].String()
 		}
 	}
 	return ""
@@ -95,7 +108,7 @@ func (m VxlanManager) LoadConn(conn tunnel.ConnConfig) error {
 		connection.RemoteAddress = conn.RemoteAddress[0]
 	}
 	if conn.LocalAddress == nil {
-		connection.LocalAddress = GetFirstInterface()
+		connection.LocalAddress = GetAddressOfFirstInterface()
 	}
 	fmt.Printf("[VxlanManager] LoadConn, Name: %s, LocalAddress: %s, RemoteAddress: %s, VtepAddress: %s",
 		connection.Name, connection.LocalAddress, connection.RemoteAddress, connection.VtepAddress)
