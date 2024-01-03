@@ -50,7 +50,7 @@ type VxlanUnicastConfig struct {
 }
 
 func CreateVxlanManager(mtu, vni, port int, vtepDevName string) VxlanManager {
-	fmt.Printf("[VxlanManager] Create vxlan manager, mtu = %d, vni = %d, port = %d, vtepDevName = %s.",
+	fmt.Printf("[VxlanManager] Create vxlan manager, mtu = %d, vni = %d, port = %d, vtepDevName = %s\n",
 		mtu, vni, port, vtepDevName)
 	return VxlanManager{
 		MTU:         mtu,
@@ -76,7 +76,7 @@ func GetAddressOfFirstInterface() string {
 	for _, val := range list {
 		if val.Type() == "device" && !(strings.HasPrefix(val.Attrs().Name, "lo")) {
 			ret, _ := netlink.AddrList(val, netlink.FAMILY_V4)
-			return ret[0].String()
+			return ret[0].IP.String()
 		}
 	}
 	return ""
@@ -110,7 +110,7 @@ func (m VxlanManager) LoadConn(conn tunnel.ConnConfig) error {
 	if conn.LocalAddress == nil {
 		connection.LocalAddress = GetAddressOfFirstInterface()
 	}
-	fmt.Printf("[VxlanManager] LoadConn, Name: %s, LocalAddress: %s, RemoteAddress: %s, VtepAddress: %s",
+	fmt.Printf("[VxlanManager] LoadConn, Name: %s, LocalAddress: %s, RemoteAddress: %s, VtepAddress: %s\n",
 		connection.Name, connection.LocalAddress, connection.RemoteAddress, connection.VtepAddress)
 
 	m.Connections[connection.Name] = connection
@@ -121,7 +121,9 @@ func (m VxlanManager) InitiateConn(name string) error {
 	if connection, exist := m.Connections[name]; !exist {
 		return fmt.Errorf("cannot find connection %s", name)
 	} else {
-		if m.Connections[name].LocalAddress == "" || m.Connections[name].RemoteAddress == "" {
+		if connection.LocalAddress == "" || connection.RemoteAddress == "" || connection.VtepAddress == "" {
+			fmt.Printf("[VxlanManager] InitiateConn: Ignore connection %s, LocalAddress: %s, RemoteAddress: %s, VtepAddress: %s\n",
+				connection.Name, connection.LocalAddress, connection.RemoteAddress, connection.VtepAddress)
 			// Ignore Edge node
 			return nil
 		}

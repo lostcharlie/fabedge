@@ -62,6 +62,7 @@ type Manager struct {
 }
 
 func (m *Manager) start() {
+	fmt.Println("[debug] Entering Manager.start()")
 	m.ensureSysctlParameters()
 
 	if m.EnableAutoNetworking {
@@ -165,6 +166,7 @@ func (m *Manager) maintainNetwork() error {
 
 // TODO: Check this
 func (m *Manager) ensureConnections() error {
+	fmt.Println("[debug] Entering Manager.ensureConnections()")
 	current, peers := m.getCurrentEndpoint(), m.getPeerEndpoints()
 
 	gw, err := routeutil.GetDefaultGateway()
