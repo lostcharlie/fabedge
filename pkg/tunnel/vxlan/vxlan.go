@@ -95,6 +95,9 @@ func (m VxlanManager) ListConnNames() ([]string, error) {
 }
 
 func (m VxlanManager) LoadConn(conn tunnel.ConnConfig) error {
+	fmt.Printf("[VxlanManager] Entering LoadConn() Name = %s, LocalAddress = %s, RemoteAddress = %s, EndpointAddress = %s.\n",
+		conn.Name, conn.LocalAddress, conn.RemoteAddress, conn.EndpointAddress)
+
 	connection := VxlanUnicastConfig{
 		Name:          conn.Name,
 		VtepAddress:   conn.EndpointAddress,

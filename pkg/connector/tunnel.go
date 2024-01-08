@@ -134,6 +134,7 @@ func (m *Manager) classifyConnectionSubnets() {
 
 // TODO: Check this
 func (m *Manager) syncConnections() error {
+	fmt.Println("[debug] Entering Manager.syncConnections()")
 	err := m.readCfgFromFile()
 	if err != nil {
 		m.log.Error(err, "failed to read tunnel config file")
